@@ -99,12 +99,12 @@
                 <!-- Graphique -->
 
                 <div class="chart" >
-                    <h2><i class="fas fa-chart-bar" style="color: #5C3BDE;"></i> Nombre de Tâches Terminées par<br> Jour</h2>
-                    <canvas id="completedTasksChart" width="400" height="400"></canvas>
+                    <h2><i class="fas fa-chart-bar" style="color: #5C3BDE;"></i>Tâches Terminées par catégories</h2>
+                    <canvas id="taskChartCat"></canvas>
                 </div>
 
                 <div class="chart">
-                    <h2><i class="fas fa-chart-line" style="color: #5C3BDE;"></i> Nombre de tâches créées par<br> jour</h2>
+                    <h2><i class="fas fa-chart-line" style="color: #5C3BDE;"></i>Tâches créées par jour</h2>
                     <canvas id="tasksOverTimeChart" width="400" height="400"></canvas>
                 </div>
 
@@ -353,6 +353,84 @@ fetch('backend/task_by_cat.php')
 });
 
 
+    </script>
+
+    <script>
+        // Requête AJAX pour obtenir les données depuis le fichier PHP
+        fetch('backend/taches_par_categories.php')
+            .then(response => response.json())
+            .then(data => {
+                // Une fois les données reçues, créer le graphique
+                const ctx = document.getElementById('taskChartCat').getContext('2d');
+                const taskChartCat = new Chart(ctx, {
+                    type: 'bar', // ou 'pie' pour un graphique circulaire
+                    data: {
+                        labels: data.categories,
+                        datasets: [{
+                            label: 'Nombre de tâches terminées par catégorie',
+                            data: data.taskCounts,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'catégories'
+                                },
+                                grid: {
+                                    display: false // Masquer les lignes de grille horizontales
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Nombre de tâches'
+                                },
+                                grid: {
+                                    borderColor: '#ddd', // Couleur des lignes de grille verticales
+                                    borderWidth: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true, // Afficher la légende
+                                position: 'top' // Position de la légende
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return `${tooltipItem.label}: ${tooltipItem.raw}`; // Format des infos de l'infobulle
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Erreur:', error));
     </script>
 </body>
 </html>
