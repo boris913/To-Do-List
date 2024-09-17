@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="images/icons8-to-do-list-64.png" type="image/x-icon">
+    <title>Dashboard</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Déclaration des variables dans :root */
+:root {
+    --color-text-general: #676767;
+    --color-background-general: #1e1e1e;
+    --color-background-card: #171717;
+    --color-background-sidebar-card-top: #353535;
+    --color-border-separator: #2e2e2e;
+    --color-text-premium-yellow: #f7b91c;
+    --color-background-icon: #2d2d2d;
+    --color-background-tooltip-head: #1d1d1d;
+    --color-background-tooltip-body: #252525;
+    --color-border-card-stack: #696969;
+    --color-background-details: #1e1e1e;
+    --color-background-add-component-head: #181818;
+    --color-text-sidebar-item-selected: white;
+    --color-border-sidebar-item-selected: white;
+    --color-border-sidebar-item: transparent;
+    --color-text-sidebar-item-hover: #a1a0a0;
+  }
+        .sidebar.active {
+            min-width: 100px !important;
+            max-width: 2px !important;
+            
+        }
+        .sidebar.active span {
+            display: none;
+            
+        }
+        .sidebar.active h2 {
+            display: none;
+            
+        }
+        .sidebar i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Menu -->
+        <div class="sidebar" style="min-width: 20%;">
+            <h2 style="color: #5C3BDE;">Menu</h2>
+            <ul>
+                <a href="/dashboard.html" style="text-decoration: none; color: #fff;"><li style=" background-color: #595f77; font-weight: bold;"><i class="fas fa-tachometer-alt" style="color: #5C3BDE;"></i><span>Dashboard</span> </li></a>
+                <a class="active" href="/task_list.php" style="text-decoration: none; color: rgba(225, 225, 225, 0.7);"><li ><i class="fas fa-list" style="color: #5C3BDE;"></i><span>Liste des tâches</span> </li></a>
+                <a href="/index.html" style="text-decoration: none; color: rgba(225, 225, 225, 0.7);"><li><i class="fas fa-plus" style="color: #5C3BDE;"></i><span>Ajouter une tâche</span> </li></a>
+
+                
+            </ul>
+        </div>
+        
+        <!-- Contenu principal du Dashboard -->
+        <div class="content">
+            <div class="header">
+                <h1>Tableau de Bord</h1>
+                <button id="toggleSidebar" class="toggle-sidebar">☰</button>
+            </div>
+            <div class="statistics">
+                <div class="card">
+                    <h3><i class="fas fa-list" style="color: #5C3BDE;"></i> Total des tâches </h3>
+                    <p id="total-tasks">0</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-check-circle" style="color: #5C3BDE;"></i> Tâches complétées </h3>
+                    <p id="completed-tasks">0</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-hourglass-half" style="color: #5C3BDE;"></i> Tâches en attente </h3>
+                    <p id="pending-tasks">0</p>
+                </div>
+            </div>
+            
+            <div class="chart-container" style="gap: 10px;">
+                <!-- Graphique -->
+                <div class="chart">
+                    <h2><i class="fas fa-chart-pie" style="color: #5C3BDE;"></i> Statistiques des Tâches</h2>
+                    <canvas id="taskChart"></canvas>
+                </div>
+                <div class="chart">
+                    <h2><i class="fas fa-poll" style="color: #5C3BDE;"></i>Tâches par catégories</h2>
+                    <canvas id="tasksByCategoryChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container" style="gap: 10px;">
+                <!-- Graphique -->
+
+                <div class="chart" >
+                    <h2><i class="fas fa-chart-bar" style="color: #5C3BDE;"></i> Nombre de Tâches Terminées par<br> Jour</h2>
+                    <canvas id="completedTasksChart" width="400" height="400"></canvas>
+                </div>
+
+                <div class="chart">
+                    <h2><i class="fas fa-chart-line" style="color: #5C3BDE;"></i> Nombre de tâches créées par<br> jour</h2>
+                    <canvas id="tasksOverTimeChart" width="400" height="400"></canvas>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        fetch('backend/task_create_per_day.php')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+        return response.json(); // Récupérer la réponse en tant que JSON
+    })
+    .then(data => {
+        console.log(data); // Affiche les données JSON
+
+        const dates = data.map(item => item.date);
+        const counts = data.map(item => item.count);
+    
+        const tasksOverTimeCtx = document.getElementById('tasksOverTimeChart').getContext('2d');
+        const tasksOverTimeChart = new Chart(tasksOverTimeCtx, {
+            type: 'line', // Type de graphique linéaire
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Tâches créées',
+                    data: counts,
+                    fill: false,
+                    borderColor: '#5C3BDE',
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)', // Couleur de la ligne et de la zone sous la courbe
+                    tension: 0.1 // Adoucir les courbes de la ligne
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        },
+                        grid: {
+                            display: false // Masquer les lignes de grille horizontales
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Nombre de tâches'
+                        },
+                        grid: {
+                            borderColor: '#ddd', // Couleur des lignes de grille verticales
+                            borderWidth: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true, // Afficher la légende
+                        position: 'top' // Position de la légende
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${tooltipItem.label}: ${tooltipItem.raw}`; // Format des infos de l'infobulle
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    })
+    .catch(error => console.error('Erreur:', error)); // Pour détecter les erreurs de réseau ou autres
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', fetchCompletedTasksPerDay);
+
+        async function fetchCompletedTasksPerDay() {
+            showLoader();
+            try {
+                const response = await fetch('backend/get_completed_tasks_per_day.php');
+                if (!response.ok) throw new Error('Erreur de réseau');
+                
+                const data = await response.json();
+                
+                if (!Array.isArray(data)) {
+                    throw new Error('Données des tâches invalides');
+                }
+        
+                const dates = data.map(item => item.date);
+                const counts = data.map(item => item.count);
+                
+                const ctx = document.getElementById('completedTasksChart').getContext('2d');
+                const completedTasksChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Tâches terminées',
+                            data: counts,
+                            backgroundColor:[
+                                '#5C3BDE60', '#007bff60', '#28a74560', '#DD8E8E90'
+                            ], // Couleur de fond des barres
+                                borderColor: [
+                                '#5C3BDE', '#007bff', '#28a745', '#DD8E8E'
+                            ], // Couleur des bordures des barres
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                },
+                                grid: {
+                                    display: false // Masquer les lignes de grille horizontales
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Nombre de tâches'
+                                },
+                                grid: {
+                                    borderColor: '#ddd', // Couleur des lignes de grille verticales
+                                    borderWidth: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true, // Afficher la légende
+                                position: 'top' // Position de la légende
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return `${tooltipItem.label}: ${tooltipItem.raw}`; // Format des infos de l'infobulle
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error(`Erreur lors de la récupération des tâches terminées: ${error.message}`);
+            } finally {
+                hideLoader();
+            }
+        }
+        
+        // Optionnel : Fonctions pour afficher et masquer un indicateur de chargement
+        function showLoader() {
+            // Implémentez cette fonction pour afficher un indicateur de chargement
+        }
+        
+        function hideLoader() {
+            // Implémentez cette fonction pour masquer l'indicateur de chargement
+        }
+        
+        
+    </script>
+
+    <script src="scripts/dashboard.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.getElementById('toggleSidebar');
+            const sidebar = document.querySelector('.sidebar');
+        
+            toggleButton.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+            });
+        });
+      // Récupérer les données depuis PHP via Ajax
+fetch('backend/task_by_cat.php')
+.then(response => response.json())
+.then(data => {
+    const categories = data.map(item => item.category);
+    const counts = data.map(item => item.count);
+
+    // Afficher le graphique avec Chart.js
+    const tasksByCategoryCtx = document.getElementById('tasksByCategoryChart').getContext('2d');
+    const tasksByCategoryChart = new Chart(tasksByCategoryCtx, {
+        type: 'bar', // Graphique à barres
+        data: {
+            labels: categories,
+            datasets: [{
+                label: 'Nombre de tâches',
+                data: counts,
+                backgroundColor:[
+                '#5C3BDE60', '#007bff60', '#28a74560', '#DD8E8E90'
+            ], // Couleur de fond des barres
+                borderColor: [
+                '#5C3BDE', '#007bff', '#28a745', '#DD8E8E'
+            ], // Couleur des bordures des barres
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false // Masquer les lignes de grille horizontales
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        borderColor: '#ddd', // Couleur de la grille verticale
+                        borderWidth: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true, // Afficher la légende
+                    position: 'top' // Position de la légende
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return `${tooltipItem.label}: ${tooltipItem.raw}`; // Format des infos de l'infobulle
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+
+
+    </script>
+</body>
+</html>

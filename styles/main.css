@@ -1,0 +1,317 @@
+@charset "UTF-8";
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.container{
+  max-width: 480px;
+  max-height: 100%;
+  background-color: #10101d;
+  padding: 20px;
+  overflow: auto;
+}
+h1 {
+  color: #333;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+input[type=text] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: calc(100% - 110px);
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 10px;
+  }
+  input[type=text] {
+    width: calc(100% - 80px);
+  }
+}
+@media (max-width: 480px) {
+  button {
+    font-size: 14px;
+  }
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.task-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  color: #fff;
+}
+
+.container {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #10101d;
+  transform: scale(1.05);
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+span {
+  font-size: 1rem;
+}
+
+body {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.completed {
+  color: #28a745;
+}
+
+.task-item {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.task-item:hover {
+  background-color: #5C3BDE;
+}
+
+button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.task-item {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.task-item.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border-radius: 4px;
+  display: none; /* Cache par défaut */
+}
+
+.loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/*# sourceMappingURL=main.css.map */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+h1{
+  color: #f0f2f5;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #1e1e1e;
+  height: 100%;
+}
+/* styles/main.css */
+
+/* Assurez-vous que le conteneur du formulaire est un conteneur flex */
+#task-form {
+  width: 100%;
+  display: flex;
+  align-items: center; /* Aligne verticalement les éléments au centre */
+  gap: 10px; /* Espacement entre l'input et le bouton */
+}
+
+/* Style pour l'input du formulaire */
+#task-title {
+  min-width: 80%;
+  flex: 1; /* Prend toute la largeur disponible */
+}
+
+/* Style pour le bouton du formulaire */
+#task-form button {
+  width: 100px; /* Largeur fixe pour le bouton */
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 0 12px var(--add-button-shadow);
+  transition: background-color 0.3s, box-shadow 0.3s;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #5C3BDE;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(238, 156, 167,0.4);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#task-form button:hover {
+  background-color: #5C3BDE;
+}
+/* styles/main.css */
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 12px;
+  background-color: #191933;
+  border-radius: 4px;
+}
+
+.task-title {
+  flex: 1;
+  color: #fff;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-task {
+  margin-right: 8px;
+}
+
+.delete-task {
+  color: #ff3d46;
+}
+
+.delete-task svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  transition: color 0.3s;
+}
+
+.delete-task:hover svg {
+  color: #ff1a1a;
+}
+.submit-task {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: none;
+  background: var(--add-button);
+  color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-plus'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E");
+  background-size: 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 12px 0 var(--add-button-shadow);
+}
