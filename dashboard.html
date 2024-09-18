@@ -90,25 +90,31 @@
                     <canvas id="taskChart"></canvas>
                 </div>
                 <div class="chart">
-                    <h2><i class="fas fa-poll" style="color: #5C3BDE;"></i>Tâches par catégories</h2>
-                    <canvas id="tasksByCategoryChart" width="400" height="400"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-container" style="gap: 10px;">
-                <!-- Graphique -->
-
-                <div class="chart" >
-                    <h2><i class="fas fa-chart-bar" style="color: #5C3BDE;"></i>Tâches Terminées par catégories</h2>
-                    <canvas id="taskChartCat"></canvas>
-                </div>
-
-                <div class="chart">
-                    <h2><i class="fas fa-chart-line" style="color: #5C3BDE;"></i>Tâches créées par jour</h2>
+                    <h2><i class="fas fa-poll" style="color: #5C3BDE;"></i>Tâches créées par jour</h2>
                     <canvas id="tasksOverTimeChart" width="400" height="400"></canvas>
                 </div>
-
+               
                 
+                
+            </div>
+
+            <div class="chart-container">
+                <!-- Graphique -->
+
+                <!-- <div class="chart" >
+                    <h2><i class="fas fa-chart-bar" style="color: #5C3BDE;"></i>Tâches Terminées par catégories</h2>
+                    <canvas id="tasksByCategoryChart" width="400" height="400"></canvas>
+                </div> -->
+
+                <!-- <div class="chart">
+                    <h2><i class="fas fa-chart-line" style="color: #5C3BDE;"></i>Tâches créées par jour</h2>
+                    <canvas id="tasksOverTimeChart" width="400" height="400"></canvas>
+                </div> -->
+                
+                <div class="chart" style="min-width: 100%;">
+                    <h2><i class="fas fa-chart-line" style="color: #5C3BDE;"></i>Tâches par catégories</h2>
+                    <canvas id="tasksCombined" width="100%" height="400"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -128,16 +134,21 @@
     
         const tasksOverTimeCtx = document.getElementById('tasksOverTimeChart').getContext('2d');
         const tasksOverTimeChart = new Chart(tasksOverTimeCtx, {
-            type: 'line', // Type de graphique linéaire
+            type: 'bar', // Type de graphique linéaire
             data: {
                 labels: dates,
                 datasets: [{
                     label: 'Tâches créées',
                     data: counts,
                     fill: false,
-                    borderColor: '#5C3BDE',
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)', // Couleur de la ligne et de la zone sous la courbe
-                    tension: 0.1 // Adoucir les courbes de la ligne
+                    backgroundColor:[
+                                '#5C3BDE60', '#007bff60', '#28a74560', '#DD8E8E90'
+                            ], // Couleur de fond des barres
+                                borderColor: [
+                                '#5C3BDE', '#007bff', '#28a745', '#DD8E8E'
+                            ], // Couleur des bordures des barres
+                    tension: 0.1, // Adoucir les courbes de la ligne
+                    borderWidth: 1,
                 }]
             },
             options: {
@@ -360,33 +371,46 @@ fetch('backend/task_by_cat.php')
         fetch('backend/taches_par_categories.php')
             .then(response => response.json())
             .then(data => {
-                // Une fois les données reçues, créer le graphique
-                const ctx = document.getElementById('taskChartCat').getContext('2d');
-                const taskChartCat = new Chart(ctx, {
-                    type: 'bar', // ou 'pie' pour un graphique circulaire
+                const categories = data.categories;
+                const taskData = data.taskData;
+
+                // Préparer les données pour les graphiques
+                const totalData = taskData.map(item => item.total);
+                const completedData = taskData.map(item => item.completed);
+                const pendingData = taskData.map(item => item.pending);
+
+                // Créer le graphique
+                const ctx = document.getElementById('tasksCombined').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
                     data: {
-                        labels: data.categories,
-                        datasets: [{
-                            label: 'Nombre de tâches terminées par catégorie',
-                            data: data.taskCounts,
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
+                        labels: categories,
+                        datasets: [
+                            {
+                                label: 'Nombre total de tâches',
+                                data: totalData,
+                                backgroundColor: '#5C3BDE70',
+                                borderColor: '#5C3BDE',
+                                tension: 0.3,
+                                borderWidth: 3,
+                            },
+                            {
+                                label: 'Nombre de tâches terminées',
+                                data: completedData,
+                                backgroundColor: '#1abc9c70',
+                                borderColor: '#1abc9c',
+                                tension: 0.3,
+                                borderWidth: 3,
+                            },
+                            {
+                                label: 'Nombre de tâches en attente',
+                                data: pendingData,
+                                backgroundColor: '#818ba170',
+                                borderColor: '#818ba1',
+                                tension: 0.3,
+                                borderWidth: 3,
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -396,7 +420,7 @@ fetch('backend/task_by_cat.php')
                                 beginAtZero: true,
                                 title: {
                                     display: true,
-                                    text: 'catégories'
+                                    text: 'Catégories'
                                 },
                                 grid: {
                                     display: false // Masquer les lignes de grille horizontales
@@ -421,13 +445,21 @@ fetch('backend/task_by_cat.php')
                             },
                             tooltip: {
                                 callbacks: {
+                                    title: function(tooltipItems) {
+                                        // Customiser le titre du tooltip
+                                        const index = tooltipItems[0].dataIndex;
+                                        const category = tooltipItems[0].label;
+                                        return `Catégorie: ${category}`;
+                                    },
                                     label: function(tooltipItem) {
-                                        return `${tooltipItem.label}: ${tooltipItem.raw}`; // Format des infos de l'infobulle
+                                        // Customiser le texte du label du tooltip
+                                        const datasetLabel = tooltipItem.dataset.label || '';
+                                        return `${datasetLabel}: ${tooltipItem.raw}`;
                                     }
                                 }
-                            }
-                        }
-                    }
+                            } // Assurez-vous que cette accolade est fermée
+                        } // Assurez-vous que cette accolade est fermée
+                    } // Assurez-vous que cette accolade est fermée
                 });
             })
             .catch(error => console.error('Erreur:', error));
